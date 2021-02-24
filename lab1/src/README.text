@@ -1,0 +1,56 @@
+Lab 1 Reflection - Jacob Valero
+Files Included: 
+- FibSeq: Sequential implementation of recursive algorithm for fibonacci.
+- FibCon: Simple concurrent implementation of recursive algorithm for fibonacci (just two threads).
+- FibCon2: Concurrent implementation of recursive algorithm for fibonacci (new thread per fib call).
+- README: Runtimes for all three implementations of the fib alg (note that only 1 run for FibCon2
+was included as it could not run more than the ~22nd fibonacci number) and reflection.
+
+Runs:
+Paradigm: Concurrent 2
+Fibonacci Number: 20
+Answer: 6765
+Execution time in milliseconds: 3715
+
+Paradigm: Sequential
+Fibonacci Number: 30
+Answer: 832040
+Execution time in milliseconds: 2
+
+Paradigm: Concurrent 1
+Fibonacci Number: 30
+Answer: 832040
+Execution time in milliseconds: 3
+
+Paradigm: Sequential
+Fibonacci Number: 40
+Answer: 102334155
+Execution time in milliseconds: 273
+
+Paradigm: Concurrent 1
+Fibonacci Number: 40
+Answer: 102334155
+Execution time in milliseconds: 155
+
+Paradigm: Sequential
+Fibonacci Number: 48
+Answer: 512559680
+Execution time in milliseconds: 12899
+
+Paradigm: Concurrent 1
+Fibonacci Number: 48
+Answer: 512559680
+Execution time in milliseconds: 7669
+
+Reflection: To come up with the first concurrent algorithm, I realized that the recursive algorithm 
+could be initally split into two threads which each continue finishing the recursive work. For 
+example, if finding the 5th fibonacci number, two threads find the fibonacci numbers for 4 and 3 
+recursively, and then add up their results to get the 5th number. Then after reading the chapter on 
+concurrent Fibonacci from CaDCiJ, it was clear that splitting could occur at every branch of the 
+recursive algorithm. However, it was initially suprising that this implementation was slower than
+both the simple concurrent version and sequential version and would only work for fibonacci numbers 
+less than ~22. After reflecting and interpreting error messages, this was most likely due to the
+intensive resource utilization of creating 2 new threads for every recursive fib call. Something 
+that was also suprising was that the first concurrent version consistently ran slower for the 30th 
+fibonacci number. This may be attributed to a greater startup time when making threads, so it may 
+be the case that the speed gains from using threading are only apparent with greater loads of work. 

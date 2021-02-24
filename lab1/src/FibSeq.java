@@ -12,11 +12,13 @@ public class FibSeq {
         }
     }
 
-    // Main: Calling the fib function, measuring output and resopnse time, and printing results.
+    // Main: Calling the fib function, measuring output and response time, and printing results.
     public static void main(String[] args) {
+        // Getting input one of two ways.
         //int input = Integer.parseInt(args[0]);
         int input = 20;
 
+        // Starting and ending fib while measuring time.
         long startTime = System.nanoTime();
         int answer = fibSeq(input);
         long endTime = System.nanoTime();

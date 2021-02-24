@@ -2,15 +2,20 @@
 
 public class FibCon2 extends Thread {
     
+    /*
+    n = The fibonacci number
+    result = The result
+    */
     int n;
     int result;
 
+    // Constructor
     public FibCon2(int n) {
         this.n = n;
     }
 
-    // Originally thread start contained in main which only forked once. By moving over forking to
-    // the fib algorithm, multiple threads can be made.
+    // Originally from FibCon, threads were contained in main and only forked once. 
+    // By moving over forking to the fib algorithm, multiple threads are made for each fib call.
     @Override
     public void run() {
         if (n <= 2) {
@@ -28,6 +33,7 @@ public class FibCon2 extends Thread {
         }
 	}
 
+    // Public accessor for result.
 	public int getResult() {
 		return result;
 	}
