@@ -16,7 +16,7 @@ public class FibSeq {
     public static void main(String[] args) {
         // Getting input one of two ways.
         //int input = Integer.parseInt(args[0]);
-        int input = 20;
+        int input = 40;
 
         // Starting and ending fib while measuring time.
         long startTime = System.nanoTime();
