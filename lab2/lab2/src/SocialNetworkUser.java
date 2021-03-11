@@ -1,16 +1,21 @@
+// Jacob Valero
+
 public class SocialNetworkUser implements Runnable{
     
     /* Fields:
     * @count: # of posts from this user.
     * @name: ID of this user.
+    * @limit: The number of times a user will post and view posts.
     */
     long count;
     String name;
     SocialNetwork network;
+    int limit;
 
     // Constructor
     public SocialNetworkUser(String name, SocialNetwork network) {
         count = 0;
+        limit = 10;
         this.name = name;
         this.network = network;
     }
@@ -21,7 +26,7 @@ public class SocialNetworkUser implements Runnable{
         System.out.println(name + " has joined and " + "can't wait to get their feet wet!");
         
         // Adding and viewing posts with random second intervals inbetween.
-        while(count < 10){
+        while(count < limit){
             network.addPost(this);
             nap();
             System.out.println(network.viewPosts(this));

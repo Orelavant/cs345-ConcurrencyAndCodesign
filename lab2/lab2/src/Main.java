@@ -1,6 +1,4 @@
-/*  Questions:
-        - Is thread ID just a string identifier of the thread (i.e. name?)
-*/ 
+// Jacob Valero
 
 public class Main {
     public static void main(String[] args) {

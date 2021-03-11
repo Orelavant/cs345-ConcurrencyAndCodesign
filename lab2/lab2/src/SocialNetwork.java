@@ -1,3 +1,5 @@
+// Jacob Valero
+
 import java.util.*; 
 
 public class SocialNetwork {
