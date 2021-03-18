@@ -7,10 +7,10 @@ public class SocialNetworkUser implements Runnable{
     * @name: ID of this user.
     * @limit: The number of times a user will post and view posts.
     */
-    long count;
-    String name;
-    SocialNetwork network;
-    int limit;
+    private long count;
+    private String name;
+    private SocialNetwork network;
+    private int limit;
 
     // Constructor
     public SocialNetworkUser(String name, SocialNetwork network) {

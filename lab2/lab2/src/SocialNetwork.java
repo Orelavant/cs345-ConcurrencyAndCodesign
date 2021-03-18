@@ -8,8 +8,8 @@ public class SocialNetwork {
     * @posts: LinkedList containing the 6 most recent posts. 
     * @totalCount: Count of the # of posts so far.
     */
-    LinkedList<String> posts;
-    long totalCount;
+    private LinkedList<String> posts;
+    private long totalCount;
 
     // Constructor
     public SocialNetwork() {
@@ -49,7 +49,7 @@ public class SocialNetwork {
         // Building string of six most recent posts.
         StringBuilder postView = new StringBuilder();
         for(String post : posts) {
-            postView.append(post.toString() + "  ");
+            postView.append(post + "  ");
         }
 
         return postView.toString();
