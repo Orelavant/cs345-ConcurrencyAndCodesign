@@ -28,32 +28,11 @@ public class Jungle {
 		// create a Ladder
 		Ladder l = new Ladder(4);
 		
-		// create some Eastbound apes who want that ladder
-		int nRemaining = eastBound;
-		int apeCounter = 1;
-		while (nRemaining != 0) {
-			Ape a = new Ape("E-"+apeCounter, l,true);
-			a.start();
-			apeCounter++;
-			tryToSleep(apeMin, apeVar);
-			if (nRemaining > 0)
-				nRemaining--;
-		}
+		// create some Eastbound and Westbound apes who want that ladder
+		apesRun(eastBound, westBound, l, apeMin, apeVar);
 
 		// put this in to create a pause that will avoid the problem BUT OF COURSE THIS IS NOT A SOLUTION TO THE LAB!
-		//tryToSleep(sideMin, sideVar);
-		
-		// and create some Westbound apes who want the SAME ladder
-		nRemaining = westBound;
-		apeCounter = 1;
-		while (nRemaining != 0) {
-			Ape a = new Ape("W-"+apeCounter, l,false);
-			a.start();
-			apeCounter++;
-			tryToSleep(apeMin, apeVar);
-			if (nRemaining > 0)
-				nRemaining--;
-		}
+		// tryToSleep(sideMin, sideVar);
 	}
 
 	private static java.util.Random dice = new java.util.Random(); // random number generator, for delays mostly	
@@ -65,7 +44,23 @@ public class Jungle {
         }
 	}
 
-    public static void apesRun(int numApes) {
-
+	// Alternates sending eastBound and westBound apes
+    public static void apesRun(int eastBound, int westBound, Ladder ladder, double apeMin, double apeVar) {
+        int nRemaining = eastBound + westBound;
+		int eastApeCounter = 1;
+		int westApeCounter = 1;
+		while (nRemaining != 0) {
+            if (eastBound > 0 && nRemaining % 2 == 0){
+                Ape a = new Ape("E-"+eastApeCounter, ladder,true);
+                a.start();
+				eastApeCounter++;
+            } else if (westBound > 0 && nRemaining % 2 == 1) {
+                Ape a = new Ape("W-"+westApeCounter, ladder,false);
+                a.start();
+				westApeCounter++;
+            }
+            nRemaining--;
+			tryToSleep(apeMin, apeVar);
+		}
     }
 }
