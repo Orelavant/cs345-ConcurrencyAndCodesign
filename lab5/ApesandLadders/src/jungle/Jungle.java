@@ -20,7 +20,7 @@ public class Jungle {
 		//
 		int    eastBound = 4; // how many apes going East? use -1 for inifinity
 		int    westBound = 4; // how many apes going West? use -1 for inifinity
-		double apeMin = 4.0;  // how long to wait between consecutive apes going one way
+		double apeMin = 1.0;  // how long to wait between consecutive apes going one way
 		double apeVar = 1.0;  //  4 seconds is usually enough, but vary a bit to see what happens
 		double sideMin = 5.0; // how long to wait before coming back across
 		double sideVar = 0.0; //  5.0 seconds is usually enough 
@@ -49,15 +49,25 @@ public class Jungle {
         int nRemaining = eastBound + westBound;
 		int eastApeCounter = 1;
 		int westApeCounter = 1;
+		boolean eastTurn;
+		if (eastBound > 0) {
+			eastTurn = true;
+		} else {
+			eastTurn = false;
+		}
 		while (nRemaining != 0) {
-            if (eastBound > 0 && nRemaining % 2 == 0){
+            if (eastBound > 0 && eastTurn){
                 Ape a = new Ape("E-"+eastApeCounter, ladder,true);
                 a.start();
 				eastApeCounter++;
-            } else if (westBound > 0 && nRemaining % 2 == 1) {
+
+				if (westBound > 0){eastTurn = !eastTurn;}
+            } else if (westBound > 0 && !eastTurn) {
                 Ape a = new Ape("W-"+westApeCounter, ladder,false);
                 a.start();
 				westApeCounter++;
+
+				if (eastBound > 0){eastTurn = !eastTurn;}
             }
             nRemaining--;
 			tryToSleep(apeMin, apeVar);
