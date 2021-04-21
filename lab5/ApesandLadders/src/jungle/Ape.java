@@ -1,4 +1,4 @@
-package jungle;
+import java.util.concurrent.*;
 
 /**
  * @author davew
@@ -8,7 +8,6 @@ package jungle;
  * share one Ladder.
  */
 public class Ape extends Thread {
-	static private final boolean debug = true;  // "static" is shared by all Apes
 	static private final double rungDelayMin = 0.8;
 	static private final double rungDelayVar = 1.0;
 	private String _name;
@@ -39,51 +38,35 @@ public class Ape extends Thread {
 			move = -1;
 		}
 		
-		// Signaling to want and attempt at start rung.
-		if (debug)
-			System.out.println("Ape " + _name + " wants rung " + startRung);			
-		if (!_ladderToCross.grabRung(startRung)) {
-			// THIS IS UGLY BUT CONFUSED ON INSTRUCTIONS OF NOT LOOPING.
-			while(!_ladderToCross.grabRung(startRung)){
-				int count = 5;
-				while (count != 0) {
-					count--;
-				}
+		// Signaling to want and attempt to grab start rung.
+		System.out.println("Ape " + _name + " wants rung " + startRung);
+		boolean printed = true;
+		while (!_ladderToCross.grabRung(startRung)) {
+			if (printed) {
+				System.out.println("Ape " + _name + " did not get  rung " + startRung + " will wait...");
 			}
-			//System.out.println("  Ape " + _name + " has been eaten by the crocodiles!");
-			//return;  // died
+			printed = false;
 		}
+		System.out.println("Ape " + _name + "  got  rung " + startRung);
 
-		// Move across rest of rungs (grabbing and releasing).
-		if (debug)
-			System.out.println("Ape " + _name + "  got  rung " + startRung);			
+		// Move across rest of rungs.
 		for (int i = startRung+move; i!=endRung+move; i+=move) {
 			Jungle.tryToSleep(rungDelayMin, rungDelayVar);
-			if (debug)
-				System.out.println("Ape " + _name + " wants rung " + i);			
-			if (!_ladderToCross.grabRung(i)) {
-				// THIS IS UGLY BUT CONFUSED ON INSTRUCTIONS OF NOT LOOPING.
-				while(!_ladderToCross.grabRung(i)){
-					int count = 5;
-					while (count != 0) {
-						count--;
-					}
+			System.out.println("Ape " + _name + " wants rung " + i);
+			printed = true;			
+			while (!_ladderToCross.grabRung(i)) {
+				if (printed) {
+					System.out.println("Ape " + _name + "  did not get  " + i + " will wait...");
 				}
-				// System.out.println("Ape " + _name + ": AAaaaaaah!  falling off the ladder :-(");
-				// System.out.println("  Ape " + _name + " has been eaten by the crocodiles!");
-				// _ladderToCross.releaseRung(i-move); /// so far, we have no way to wait, so release the old lock as we die :-(
-				// return;  //  died
+				printed = false;
 			}
-			if (debug)
-				System.out.println("Ape " + _name + "  got  " + i + " releasing " + (i-move));			
 			_ladderToCross.releaseRung(i-move);
+			System.out.println("Ape " + _name + "  got  " + i + " releasing " + (i-move));
 		}
 
 		// Releasing end rung
-		if (debug)
-			System.out.println("Ape " + _name + " releasing " + endRung);			
 		_ladderToCross.releaseRung(endRung);
+		System.out.println("Ape " + _name + " releasing " + endRung);
 		System.out.println("Ape " + _name + " finished going " + (_goingEast?"East.":"West."));
-		return;  // survived!
 	}
 }

@@ -1,4 +1,3 @@
-package jungle;
 import java.util.concurrent.*;
 import java.util.ArrayList;
 
@@ -11,6 +10,7 @@ import java.util.ArrayList;
 public class Ladder {
 	private int rungCapacity[];
 	private Semaphore[] semArr;
+	private Semaphore eastUse;
 	
 	public Ladder(int _nRungs) {
 		rungCapacity = new int[_nRungs];
@@ -21,6 +21,10 @@ public class Ladder {
 			Semaphore sem = new Semaphore(1, true); 
 			semArr[i] = sem;
         }	
+	}
+
+	public Semaphore getEastUse(){
+		return eastUse;
 	}
 	
     public int nRungs() {
