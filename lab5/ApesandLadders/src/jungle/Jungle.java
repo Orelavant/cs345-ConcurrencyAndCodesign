@@ -9,16 +9,8 @@ import java.util.Random;
  */
 public class Jungle {	
 	public static void main(String[] args) {
-		//
-		//  A solution for Lab 3 should work (have no deadlock, livelock, or starvation)
-		//    regardless of the settings of the configuration variables below,
-		//    i.e., even if there are infinite apes going both ways.
-		//  It should also work regardless of timing, so any values for the
-		//    timing configuration should work, and there should be no way to
-		//    add spurious "tryToSleep"'s *anywhere* to mess it up.
-		//
-		int    eastBound = 1; // how many apes going East? use -1 for inifinity
-		int    westBound = 1; // how many apes going West? use -1 for inifinity
+		int    eastBound = 2; // how many apes going East? use -1 for inifinity
+		int    westBound = 2; // how many apes going West? use -1 for inifinity
 		double apeMin = 1.0;  // how long to wait between consecutive apes going one way
 		double apeVar = 1.0;  // 4 seconds is usually enough, but vary a bit to see what happens
 		
@@ -29,17 +21,21 @@ public class Jungle {
 		apesRun(eastBound, westBound, l, apeMin, apeVar);
 	}
 
-	private static java.util.Random dice = new java.util.Random(); // random number generator, for delays mostly	
+	// random number generator, for delays mostly
+	private static java.util.Random dice = new java.util.Random(); 	
 	public static void tryToSleep(double secMin, double secVar) {
         try {
-            java.lang.Thread.sleep(Math.round(secMin*1000) + Math.round(dice.nextDouble()*(secVar)*1000));
+            java.lang.Thread.sleep(Math.round(secMin*1000) + 
+			Math.round(dice.nextDouble()*(secVar)*1000));
         } catch (InterruptedException e) {
-            System.out.println("Not Handling interruptions yet ... just going on with the program without as much sleep as needed ... how appropriate!");
+            System.out.println("Not Handling interruptions yet ... " +
+			"just going on with the program without as much sleep as needed ... how appropriate!");
         }
 	}
 
-	// Alternates sending eastBound and westBound apes
-    public static void apesRun(int eastBound, int westBound, Ladder ladder, double apeMin, double apeVar) {
+	// Alternates creating eastBound and westBound apes
+    public static void apesRun(int eastBound, int westBound, Ladder ladder, double apeMin, 
+	double apeVar) {
         int nRemaining = eastBound + westBound;
 		int eastApeCounter = 1;
 		int westApeCounter = 1;
