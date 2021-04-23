@@ -13,13 +13,15 @@ public class Ladder {
 	// USE LINKEDLISTS INSTEAD OF ARRAYS FOR Qs;
 	// MAKE ADDING TO LADDER Q METHOD, SYNCHRONIZE IT SO IT DOESN'T CONFLICT WITH SENDING APES.
 	// IF FAIRNESS MATTERS, WE CAN ADD A FIRST APE ATTRIBUTE SO THAT ONLY THE FIRST APE CHECKS IF LADDER IS AVAILABLE.
-	private int rungCapacity[];
+	// INSTEAD OF SYNCHRONIZED, USE A MUTEX FOR METHODS WHICH HAVE TO BE SYNCHRONIZED WITH ITSELF BUT NOT OTHER METHODS.
+	// Ask how to make last ape go last, can you make it sleep?
+	// Instead of doing last ape stuff, keep track of apes on ladder. Once apes are finished, you can release.
+	private int[] rungCapacity;
 	private Semaphore[] semArr;
 	private ArrayList<Ape> eastLadderq;
 	private ArrayList<Ape> westLadderq;
 	private static final int CAP = 5; // # of apes who can go next on the ladder
 	private boolean ladderAvail;
-	private boolean eastPriority; // Which side is ready to use the ladder.
 
 	public Ladder(int _nRungs) {
 		rungCapacity = new int[_nRungs];
@@ -50,7 +52,7 @@ public class Ladder {
 		int count;
 		Ape currApe;
 		if (size >= CAP) {
-			count = CAP-1;
+			count = CAP - 1;
 		} else {
 			count = size - 1;
 		}
@@ -65,14 +67,6 @@ public class Ladder {
 		currApe.setCanCross(true);
 		q.remove(0); // SLOW, WILL CHANGE TO LINKED LIST.
 		currApe.lastApe = true; // THIS IS BAD SINCE ITS PUBLIC, CHANGE LATER.
-	}
-
-	public synchronized boolean getEastPriority() {
-		return eastPriority;
-	}
-
-	public synchronized void setEastPriority(boolean bool){
-		eastPriority = bool;
 	}
 
 	// Synchornized so that only 1 monkey can get and set ladderAvail.
@@ -96,6 +90,14 @@ public class Ladder {
 	public ArrayList<Ape> getWestLadderq() {
 		return westLadderq;
 	}
+
+	public synchronized void addEastLadderq(Ape ape) {
+		eastLadderq.add(ape);
+	}
+	
+	public synchronized void addWestLadderq(Ape ape) {
+		westLadderq.add(ape);
+	} 
 	
     public int nRungs() {
 		return rungCapacity.length;

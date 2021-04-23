@@ -1,5 +1,3 @@
-import java.util.Random;
-
 /**
  * @author davew
  *
@@ -9,8 +7,8 @@ import java.util.Random;
  */
 public class Jungle {	
 	public static void main(String[] args) {
-		int    eastBound = 3; // how many apes going East? use -1 for inifinity
-		int    westBound = 3; // how many apes going West? use -1 for inifinity
+		int    eastBound = 5; // how many apes going East? use -1 for inifinity
+		int    westBound = 5; // how many apes going West? use -1 for inifinity
 		double apeMin = 1.0;  // how long to wait between consecutive apes going one way
 		double apeVar = 1.0;  // 4 seconds is usually enough, but vary a bit to see what happens
 		

@@ -9,5 +9,5 @@ That way, multiple apes can only cross with their fellow apes. To prevent starva
 to the number of apes that cross from one side at a time, so that the other side gets a chance to
 cross too.
 
-What was implemented after many tries:
+What was implemented after many iterations:
 Assuming that we cannot know how many apes exist (i.e. by grabbing the number from jungle).

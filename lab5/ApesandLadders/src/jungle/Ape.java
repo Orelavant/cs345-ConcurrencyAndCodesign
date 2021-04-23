@@ -1,7 +1,3 @@
-import java.util.concurrent.*;
-
-import jdk.internal.jshell.tool.resources.l10n_ja;
-
 /**
  * @author davew
  *
@@ -10,8 +6,8 @@ import jdk.internal.jshell.tool.resources.l10n_ja;
  * share one Ladder.
  */
 public class Ape extends Thread {
-	static private final double rungDelayMin = 0.8;
-	static private final double rungDelayVar = 1.0;
+	private static final double rungDelayMin = 0.8;
+	private static final double rungDelayVar = 1.0;
 	private String _name;
 	private Ladder _ladderToCross;
 	private boolean _goingEast; // if false, going west
@@ -48,6 +44,10 @@ public class Ape extends Thread {
 		
 		// Signaling to want start rung and checking ladder use if opposite apes are crossing.
 		block(_goingEast, _ladderToCross);
+		// Ensuring that last ape finishes last.
+		if (lastApe) {
+			Jungle.tryToSleep(rungDelayMin*2, rungDelayVar);
+		}
 		System.out.println("Ape " + _name + " wants rung " + startRung);
 
 		// If ladder available, attempt at grabbing start rung.
@@ -75,26 +75,32 @@ public class Ape extends Thread {
 			System.out.println("Ape " + _name + "  got  " + i + " releasing " + (i-move));
 		}
 
-		// Releasing end rung. Check other q, if monkeys are ready to go, let them go.
-		// If not, ladder is now available to next monkey.
+		// Releasing end rung.
 		_ladderToCross.releaseRung(endRung);
+		System.out.println("Ape " + _name + " releasing " + endRung);
+		System.out.println("Ape " + _name + " finished going " + (_goingEast?"East.":"West."));
+
+		// Check other q, if monkeys are ready to go, let them go.
+		// If not, ladder is now available to next monkey.
 		if (lastApe) {
 			if (_goingEast) {
 				if (!_ladderToCross.getWestLadderq().isEmpty()){
 					_ladderToCross.sendApes(!_goingEast);
+					System.out.println("Ape " + _name + " released west apes who were waiting.");
 				} else {
 					_ladderToCross.setLadderAvail(true);
+					System.out.println("The ladder is available to the next ape who wants it");
 				}
 			} else {
 				if (!_ladderToCross.getEastLadderq().isEmpty()){
-					_ladderToCross.sendApes(_goingEast);
+					_ladderToCross.sendApes(!_goingEast);
+					System.out.println("Ape " + _name + " released east apes who were waiting.");
 				} else {
 					_ladderToCross.setLadderAvail(true);
+					System.out.println("The ladder is available to the next ape who wants it");
 				}
 			}
 		}
-		System.out.println("Ape " + _name + " releasing " + endRung);
-		System.out.println("Ape " + _name + " finished going " + (_goingEast?"East.":"West."));
 	}
 
 	public boolean getCanCross() {
@@ -109,7 +115,7 @@ public class Ape extends Thread {
 	private void block(boolean goingEast, Ladder l) {
 		// Check if ladder is available, if so, block ladder use from opposing apes.
 		if (goingEast) {
-			l.getEastLadderq().add(this);
+			l.addEastLadderq(this);
 
 			// CHANGE THIS TO A METHOD CALLED WAIT() AND PRINT CURRENT Q
 			// If you can cross or if ladder is available, go.
@@ -127,7 +133,7 @@ public class Ape extends Thread {
 				l.sendApes(goingEast); 
 			}
 		} else {
-			l.getWestLadderq().add(this);
+			l.addWestLadderq(this);
 
 			// If you can cross or if ladder is available, go.
 			// In other words, if you can't cross and if ladder isn't available, stay.
