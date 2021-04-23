@@ -13,7 +13,6 @@ public class Ape extends Thread {
 	private boolean _goingEast; // if false, going west
 	private boolean printed;
 	private boolean canCross; // Set to true if able to cross while a friendly ape is crossing.
-	public boolean lastApe; // Last ape to cross in a bunch, will be the one to give ladder access back.
 	
 	public Ape(String name, Ladder toCross, boolean goingEast) {
 		_name = name;
@@ -21,7 +20,6 @@ public class Ape extends Thread {
 		_goingEast = goingEast;
 		printed = true;
 		canCross = false;
-		lastApe = false;
 	}
 	
 	@Override
@@ -44,10 +42,11 @@ public class Ape extends Thread {
 		
 		// Signaling to want start rung and checking ladder use if opposite apes are crossing.
 		block(_goingEast, _ladderToCross);
-		// Ensuring that last ape finishes last.
-		if (lastApe) {
-			Jungle.tryToSleep(rungDelayMin*2, rungDelayVar);
-		}
+		_ladderToCross.addApeCount(1);
+		// // Ensuring that last ape finishes last.
+		// if (lastApe) {
+		// 	Jungle.tryToSleep(rungDelayMin*2, rungDelayVar);
+		// }
 		System.out.println("Ape " + _name + " wants rung " + startRung);
 
 		// If ladder available, attempt at grabbing start rung.
@@ -77,12 +76,13 @@ public class Ape extends Thread {
 
 		// Releasing end rung.
 		_ladderToCross.releaseRung(endRung);
+		_ladderToCross.addApeCount(-1);
 		System.out.println("Ape " + _name + " releasing " + endRung);
 		System.out.println("Ape " + _name + " finished going " + (_goingEast?"East.":"West."));
 
 		// Check other q, if monkeys are ready to go, let them go.
 		// If not, ladder is now available to next monkey.
-		if (lastApe) {
+		if (_ladderToCross.getApeCount() == 0) {
 			if (_goingEast) {
 				if (!_ladderToCross.getWestLadderq().isEmpty()){
 					_ladderToCross.sendApes(!_goingEast);

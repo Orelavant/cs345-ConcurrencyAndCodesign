@@ -22,6 +22,7 @@ public class Ladder {
 	private ArrayList<Ape> westLadderq;
 	private static final int CAP = 5; // # of apes who can go next on the ladder
 	private boolean ladderAvail;
+	private int apeCount; // # of apes on ladder.
 
 	public Ladder(int _nRungs) {
 		rungCapacity = new int[_nRungs];
@@ -35,6 +36,15 @@ public class Ladder {
 		eastLadderq = new ArrayList<>();
 		westLadderq = new ArrayList<>();
 		ladderAvail = true;
+		apeCount = 0;
+	}
+
+	public synchronized int getApeCount() {
+		return apeCount;
+	}
+
+	public synchronized void addApeCount(int n) {
+		apeCount += n;
 	}
 
 	public synchronized void sendApes(boolean eastApes) {
@@ -47,26 +57,18 @@ public class Ladder {
 		}
 
 		// Send apes up to CAP if there are more than CAP.
-		int i = 0;
-		int size = q.size();
 		int count;
 		Ape currApe;
-		if (size >= CAP) {
-			count = CAP - 1;
+		if (q.size() >= CAP) {
+			count = CAP;
 		} else {
-			count = size - 1;
+			count = q.size();
 		}
-		while(i != count) {
+		for(int i = 0; i < count; i++) {
 			currApe = q.get(0);
 			currApe.setCanCross(true);
 			q.remove(0); // SLOW, WILL CHANGE TO LINKED LIST.
-			i++;
 		}
-
-		currApe = q.get(0);
-		currApe.setCanCross(true);
-		q.remove(0); // SLOW, WILL CHANGE TO LINKED LIST.
-		currApe.lastApe = true; // THIS IS BAD SINCE ITS PUBLIC, CHANGE LATER.
 	}
 
 	// Synchornized so that only 1 monkey can get and set ladderAvail.
