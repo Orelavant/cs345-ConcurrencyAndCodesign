@@ -6,13 +6,22 @@
  * share one Ladder.
  */
 public class Ape extends Thread {
+	/*
+	* rungDelayMin: Minimum delay between grabbing rungs.
+	* rungDelayVar: Variation in time between grabbing rungs.
+	* _name: Name of ape.
+	* _ladderToCross: Ladder being used to cross.
+	* _goingEast: Whether or not the ape is heading east.
+	* printed: Prevents multiple "waiting..." print messages from printing.
+	* canCross: Whether an ape waiting in q has been given the signal to cross or not.
+	*/ 
 	private static final double rungDelayMin = 0.8;
 	private static final double rungDelayVar = 1.0;
 	private String _name;
 	private Ladder _ladderToCross;
-	private boolean _goingEast; // if false, going west
+	private boolean _goingEast;
 	private boolean printed;
-	private boolean canCross; // Set to true if able to cross while a friendly ape is crossing.
+	private boolean canCross;
 	
 	public Ape(String name, Ladder toCross, boolean goingEast) {
 		_name = name;
@@ -20,6 +29,14 @@ public class Ape extends Thread {
 		_goingEast = goingEast;
 		printed = true;
 		canCross = false;
+	}
+
+	public boolean getCanCross() {
+		return canCross;
+	}
+
+	public void setCanCross(boolean bool) {
+		canCross = bool;
 	}
 	
 	@Override
@@ -40,32 +57,21 @@ public class Ape extends Thread {
 			move = -1;
 		}
 		
-		// Signaling to want start rung and checking ladder use if opposite apes are crossing.
-		block(_goingEast, _ladderToCross);
+		// If ladder available: go, bring fellow apes in queue, and block ladder. If not, wait in q.
+		blockAndSend(_goingEast, _ladderToCross);
+
+		// Attempt at grabbing start rung, wait if neccesary.
 		_ladderToCross.addApeCount(1);
 		System.out.println("Ape " + _name + " wants rung " + startRung);
-
-		// If ladder available, attempt at grabbing start rung.
-		while (!_ladderToCross.tryGrabRung(startRung)) {
-			if (printed) {
-				System.out.println("Ape " + _name + " did not get  rung " + startRung + 
-				" will wait...");
-			}
-			printed = false;
-		}
+		rungWait(startRung, _ladderToCross);
 		System.out.println("Ape " + _name + "  got  rung " + startRung);
 
 		// Move across rest of rungs when possible.
 		for (int i = startRung+move; i!=endRung+move; i+=move) {
+			// Delay, check rung availability and wait if neccesary, continue when possible.
 			Jungle.tryToSleep(rungDelayMin, rungDelayVar);
 			System.out.println("Ape " + _name + " wants rung " + i);
-			printed = true;			
-			while (!_ladderToCross.tryGrabRung(i)) {
-				if (printed) {
-					System.out.println("Ape " + _name + "  did not get  " + i + " will wait...");
-				}
-				printed = false;
-			}
+			rungWait(i, _ladderToCross);
 			_ladderToCross.releaseRung(i-move);
 			System.out.println("Ape " + _name + "  got  " + i + " releasing " + (i-move));
 		}
@@ -76,8 +82,35 @@ public class Ape extends Thread {
 		System.out.println("Ape " + _name + " releasing " + endRung);
 		System.out.println("Ape " + _name + " finished going " + (_goingEast?"East.":"West."));
 
-		// Check other q, if apes are ready to go, let them go. Then check same q.
-		// If not, ladder is now available to next ape.
+		// If last ape to cross, check qs for monkeys ready to go, with priority towards opposing q.
+		qCheck();
+	}
+
+	// Checking ladder use and waiting if neccesary.
+	private void blockAndSend(boolean goingEast, Ladder l) {
+		if (goingEast) {
+			l.addEastLadderq(this);
+			qWait(l);
+
+			// Send apes from q if you got the ladder first.
+			if (!canCross){
+				l.sendApes(goingEast); 
+			}
+
+		} else {
+			l.addWestLadderq(this);
+			qWait(l);
+
+			// Send apes from q if you got the ladder first.
+			if (!canCross){
+				l.sendApes(!goingEast); 
+			}
+		}
+	}
+
+	// When last ape crosses, check opposing q for apes. If none there, check its q. 
+	// If none at all available, ladder is now available.
+	private void qCheck() {
 		if (_ladderToCross.getApeCount() == 0) {
 			if (_goingEast) {
 				if (!_ladderToCross.getWestLadderq().isEmpty()) {
@@ -105,52 +138,28 @@ public class Ape extends Thread {
 		}
 	}
 
-	public boolean getCanCross() {
-		return canCross;
+	// When ladder is in use, wait in respective q.
+	private void qWait(Ladder l) {
+		// If ape can cross or if ladder is available, go.
+		// Used a synchronized boolean instead of a sempahore because not all apes who
+		// wait should wait for semaphore. Only first ape cares about ladder availability.
+		printed = true;
+		while(!canCross && !l.getAndSetLadderAvail()) {
+			if (printed) {
+				System.out.println("Ape " + _name + " is waiting for permission to go...");
+			}
+			printed = false;
+		}
 	}
 
-	public void setCanCross(boolean bool) {
-		canCross = bool;
-	}
-
-	// Checking ladder use if opposite apes are crossing.
-	private void block(boolean goingEast, Ladder l) {
-		// Check if ladder is available, if so, block ladder use from opposing apes.
-		if (goingEast) {
-			l.addEastLadderq(this);
-
-			// CHANGE THIS TO A METHOD CALLED WAIT()
-			// If you can cross or if ladder is available, go.
-			// In other words, if you can't cross and if ladder isn't available, stay.
-			printed = true;
-			while(!canCross && !l.getAndSetLadderAvail()) {
-				if (printed) {
-					System.out.println("Ape " + _name + " is waiting for permission to go...");
-				}
-				printed = false;
+	// When next rung is in use, wait.
+	private void rungWait(int rung, Ladder l) {
+		printed = true;
+		while (!l.tryGrabRung(rung)) {
+			if (printed) {
+				System.out.println("Ape " + _name + " did not get rung " + rung + " will wait...");
 			}
-
-			// Send apes from q if you got the ladder.
-			if (!canCross){
-				l.sendApes(goingEast); 
-			}
-		} else {
-			l.addWestLadderq(this);
-
-			// If you can cross or if ladder is available, go.
-			// In other words, if you can't cross and if ladder isn't available, stay.
-			printed = true;
-			while(!canCross && !l.getAndSetLadderAvail()) {
-				if (printed) {
-					System.out.println("Ape " + _name + " is waiting for permission to go...");
-				}
-				printed = false;
-			}
-
-			// Send apes from q if you got the ladder.
-			if (!canCross){
-				l.sendApes(!goingEast); 
-			}
+			printed = false;
 		}
 	}
 }
