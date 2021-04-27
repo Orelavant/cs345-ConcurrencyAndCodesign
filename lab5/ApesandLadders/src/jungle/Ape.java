@@ -150,6 +150,9 @@ public class Ape extends Thread {
 				System.out.println("Ape " + _name + " is waiting for permission to go...");
 			}
 			printed = false;
+			// Think wait would be better, but let's say the ape eats a banana before checking 
+			// availability again so that they do something useful.
+			Jungle.tryToSleep(rungDelayMin, rungDelayVar);
 		}
 	}
 
@@ -162,6 +165,9 @@ public class Ape extends Thread {
 				System.out.println("Ape " + _name + " did not get rung " + rung + " will wait...");
 			}
 			printed = false;
+			// Think wait would be better, but let's say the ape eats a banana before checking 
+			// availability again so that they do something useful.
+			Jungle.tryToSleep(rungDelayMin, rungDelayVar);
 		}
 	}
 }
