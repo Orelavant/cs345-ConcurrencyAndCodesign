@@ -58,7 +58,7 @@ public class Jungle {
 				if (eastBound > 0){eastTurn = !eastTurn;}
             }
             nRemaining--;
-			//tryToSleep(apeMin, apeVar);
+			tryToSleep(apeMin, apeVar);
 		}
     }
 }

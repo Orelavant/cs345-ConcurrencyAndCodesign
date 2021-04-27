@@ -143,6 +143,7 @@ public class Ape extends Thread {
 		// If ape can cross or if ladder is available, go.
 		// Used a synchronized boolean instead of a sempahore because not all apes who
 		// wait should wait for semaphore. Only first ape cares about ladder availability.
+		// Using wait() and notify() would be more optimal but I had trouble implementing that.
 		printed = true;
 		while(!canCross && !l.getAndSetLadderAvail()) {
 			if (printed) {
@@ -154,6 +155,7 @@ public class Ape extends Thread {
 
 	// When next rung is in use, wait.
 	private void rungWait(int rung, Ladder l) {
+		// Using wait() and notify() would be more optimal but I had trouble implementing that.
 		printed = true;
 		while (!l.tryGrabRung(rung)) {
 			if (printed) {
